@@ -1,0 +1,8 @@
+discord.py==1.7.3
+photutils==1.1.0
+scipy==1.7.1
+scikit-learn==0.24.2
+colour-demosaicing==0.1.6
+validators==0.18.2
+gdown==3.13.0
+requests=2.26.0
