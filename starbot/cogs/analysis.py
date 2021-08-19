@@ -43,7 +43,11 @@ async def download_image_from_google_drive(url: str, temp_dir: Path) -> Optional
     if google_id is None:
         return None
 
-    return await pool.submit(google_download, google_id, temp_dir)
+    try:
+        return await pool.submit(google_download, google_id, temp_dir)
+    except BaseException as e:
+        logger.exception(e, exc_info=e)
+        return None
 
 
 async def download_image_direct(url: str, temp_dir: Path) -> Path:
@@ -73,11 +77,13 @@ async def download_user_image(ctx: commands.Context, temp_dir: Path) -> Optional
         elif url.lower().endswith('.fit') or url.lower().endswith('.fits'):
             image_filename = await download_image_direct(url, temp_dir)
         else:
+            logger.error(f'Unsupported image source, message contents: {ctx.message.content}')
             await ctx.send('Your image must be an attachment or on google drive')
             return None
 
         if image_filename is None:
-            await ctx.send('I wasn\'t able to download your image')
+            logger.error(f'Cannot download image, message contents: {ctx.message.content}')
+            await ctx.send('Something went wrong downloading your image :frowning:')
             return None
 
         if not image_filename.suffix.lower() in ['.fit', '.fits']:
@@ -117,9 +123,10 @@ class AnalysisCog(commands.Cog, name='Analysis'):
 
         with tempfile.TemporaryDirectory() as tmpdir:
             try:
+                await ctx.send('You got it. This takes a few minutes, hold tight...')
                 image_filename = await download_user_image(ctx, Path(tmpdir))
                 if not image_filename:
-                    await ctx.send('Something went wrong downloading your image :frowning:')
+                    return
 
                 result = await self.pool.submit(process_image, image_filename)
                 if result.success:
