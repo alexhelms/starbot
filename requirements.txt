@@ -6,3 +6,4 @@ colour-demosaicing==0.1.6
 validators==0.18.2
 gdown==3.13.0
 requests==2.26.0
+matplotlib==3.4.3
