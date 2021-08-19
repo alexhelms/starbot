@@ -1,4 +1,4 @@
-# Starbot
+# Starbot :star::robot:
 
 A discord bot for analyzing fit/fits images FWHM.
 
